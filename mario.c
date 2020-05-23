@@ -1,20 +1,23 @@
 #include <ncurses.h>
 #include <unistd.h>
+#include <math.h>
 
-const char* char_idle = 
+//minimum amount of columns for the ground
+#define MIN_GROUND 5
+
+const char* char_anim[] = {
 "(_)  "
 "(0-0)"
 "\\___/"
 "|||| "
 "|||| "
-;
-const char* char_walk = 
+,
 "(_)  "
 "(0-0)"
 "\\___/"
 " ||||"
 " ||||"
-;
+};
 
 
 void draw_pic(const char* pic, int pos[2], int size[2]) {
@@ -25,6 +28,14 @@ void draw_pic(const char* pic, int pos[2], int size[2]) {
 	}
 }
 
+void draw_pic_align(const char* pic, int pos[2], int size[2], double align[2]) {
+	int new_pos[2] = {
+		pos[0] - floor(align[0] * size[0]),
+		pos[1] - floor(align[1] * size[1]),
+	};
+	draw_pic(pic, new_pos, size);
+}
+
 void init() {
 	initscr();
 	noecho();
@@ -32,20 +43,14 @@ void init() {
 }
 
 void draw() {
-	const char** curr_anim = &char_idle;
-	char is_walk = 0;
-
-	int pos[2] = {0, 0}, size[2] = { 5, 5 }, i = 0;
+	int pos[2] = { 5, 0 }, size[2] = { 5, 5 };
+	double alignment[2] = { 1, 0 };
+	int i = 0;
 	while(1) {
 		erase();
 
-		if(i%10000==0) {
-			curr_anim = is_walk ? &char_idle : &char_walk;
-			is_walk = !is_walk;
-		}
-
-		draw_pic(*curr_anim, pos, size);
-		i++;
+		draw_pic_align(char_anim[i/10000%2==0], pos, size, alignment);
+		++i;
 
 		refresh();
 
