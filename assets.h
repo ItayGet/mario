@@ -1,8 +1,5 @@
 #pragma once
 
-//minimum amount of columns for the ground
-#define MIN_GROUND 5
-
 const char* char_anim[] = {
 "(_)  "
 "(0-0)"

@@ -2,7 +2,10 @@
 #include <unistd.h>
 #include <math.h>
 #include "assets.h"
+#include "consts.h"
 #include "img.h"
+#include "cha.h"
+#include "camera.h"
 
 void draw_ground_upper(int* ground, int len, int base) {
 	for(int i = 0; i < len; i++) {
@@ -35,7 +38,17 @@ void draw_ground(int* ground, int len, int win_size[2]) {
 			);
 }
 
-void change_pos(int pos[2], int* ground, int ground_len, int size[2]) {
+void change_pos(Cha* ch, const Camera* cam, const int* ground, int ground_len, const Pos* dir) {
+	Pos* pos = &ch->pos;
+	int on_ground = pos->y + 1 == ground[pos->x];
+
+	++pos->x;
+	if(on_ground) {
+		
+	} else {
+		
+	}
+
 }
 
 void init() {
@@ -44,21 +57,33 @@ void init() {
 	curs_set(FALSE);
 }
 
+#define sizeof_arr(arr) sizeof(arr)/sizeof(arr[0])
 void draw() {
-	int pos[2] = { 6, 1 }, size[2] = { 5, 5 };
 	double alignment[2] = { 1, 0 };
+	Cha ch = 
+	{
+		{
+			char_anim[0],
+			{ 0, 0 }, 
+			{ 5, 5 } 
+		},
+		{ 4, 0 }
+	};
 
-	struct img c = { char_anim[0], { 1, 1 }, { 5, 5 } };
+	Camera cam = { { 0, 0 }, 0 };
 
 	int i = 0;
-	int win_size[2];
+	Pos dir = { 0, 1 };
 	while(1) {
-		getmaxyx(stdscr, win_size[0], win_size[1]);
+		getmaxyx(stdscr, cam.win_size.y, cam.win_size.x);
 		erase();
 
-		draw_ground(level1, sizeof(level1)/sizeof(level1[0]), win_size);
-		draw_img(&c);
-		if(i%10000==0) { c.pos[1] += 1; }
+		draw_ground(level1, sizeof_arr(level1), cam.win_size.arr);
+		update_img_pos(&ch, &cam);
+		draw_img(&ch.img);
+		if(i%10000==0) {
+			change_pos(&ch, &cam, level1, sizeof_arr(level1), &dir);
+		}
 		++i;
 
 		refresh();

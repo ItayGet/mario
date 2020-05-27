@@ -1,11 +1,12 @@
 #pragma once
+#include "pos.h"
 
-struct img {
+typedef struct {
 	const char* data;
-	int pos[2];
-	int size[2];
-};
+	Pos pos;
+	Pos size;
+} Img;
 
-void img_align_pos(int pos[2], int size[2], double align[2]);
+void img_align_pos(Pos* pos, const Pos* size, double align[2]);
 
-void draw_img(const struct img* im);
+void draw_img(const Img* im);

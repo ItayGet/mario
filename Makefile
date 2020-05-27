@@ -5,7 +5,7 @@ LIBS = -lncurses -lm
 
 DEPS = img.h
 
-OBJ = img.o mario.o
+OBJ = img.o camera.o cha.o mario.o
 
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
