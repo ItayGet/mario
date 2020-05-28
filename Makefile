@@ -3,13 +3,12 @@ CFLAGS = -I.
 
 LIBS = -lncurses -lm
 
-DEPS = img.h
-
-OBJ = img.o camera.o cha.o mario.o
+DEPS = 
+OBJ = img.o camera.o cha.o mario.o ground.o
 
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
-
+	
 mario: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
