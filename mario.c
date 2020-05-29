@@ -9,26 +9,37 @@
 #include "ground.h"
 
 int on_ground(const Cha* cha, const int* ground, int ground_len) {
-	const int* x = &cha->pos.x;
+	const int x = (int)cha->pos.x;
 
 	//check every column
 	for(int i = 0; i < cha->col_size.x; ++i) {
-		if(i + *x >= ground_len) { return 0; }
-		if(cha->pos.y - 1 <= ground[i + *x]) {
+		if(i + x >= ground_len) { return 0; }
+		if(cha->pos.y - 1 <= ground[i + x]) {
 			return 1;
 		}
 	}
 	return 0;
 }
 
+void scale_num(double* num, int sign, double scale, double max) {
+	*num += sign * scale;
+	if(sign * *num >= max) {
+		*num = sign * max;
+	}
+	
+}
+
 void change_pos(Cha* cha, const Camera* cam, const int* ground, int ground_len, const Pos* dir) {
-	Pos* pos = &cha->pos;
+	Posd* pos = &cha->pos;
 
 	if(on_ground(cha, ground, ground_len)) {
-		++pos->x;
+		scale_num(&cha->vel.x, dir->x, .0005, MAX_SPEED);
 	} else {
-		--pos->y;
+		pos->y -= .5;
 	}
+
+	pos->y += cha->vel.y;
+	pos->x += cha->vel.x;
 
 }
 
@@ -36,6 +47,8 @@ void init() {
 	initscr();
 	noecho();
 	curs_set(FALSE);
+	cbreak();
+	nodelay(stdscr, 1);
 }
 
 void draw_axes(const Camera* cam) {
@@ -60,8 +73,8 @@ void draw() {
 	Camera cam = { { 0, 0 }, 0 };
 
 	int i = 0;
-	Pos dir = { 0, 1 };
 	while(1) {
+		Pos dir = { 0, 0 };
 		getmaxyx(stdscr, cam.win_size.y, cam.win_size.x);
 		erase();
 
@@ -69,7 +82,21 @@ void draw() {
 		update_img_pos(&ch, &cam);
 		draw_img(&ch.img);
 		//draw_axes(&cam);
-		if(i%1000==0) {
+
+		char c = getch();
+		switch(c) {
+			case 'd':
+				++dir.x;
+				break;
+			case 'a':
+				--dir.x;
+				break;
+			case 'r':
+				ch.pos.y = 10;
+				ch.pos.x = 0;
+		}
+		
+		if(i%1000==0 || true) {
 			change_pos(&ch, &cam, level1, sizeof_arr(level1), &dir);
 		}
 		++i;
