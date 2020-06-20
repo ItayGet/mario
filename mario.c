@@ -33,7 +33,20 @@ void change_pos(Cha* cha, const Camera* cam, const int* ground, int ground_len, 
 	Posd* pos = &cha->pos;
 
 	if(on_ground(cha, ground, ground_len)) {
-		scale_num(&cha->vel.x, dir->x, .0005, MAX_SPEED);
+		if(dir->x) {
+			scale_num(&cha->vel.x, dir->x, .0005, MAX_SPEED);
+		} else {
+			
+			double* xVel = &cha->vel.x;
+			int sign = *xVel > 0 ? 1 : -1;
+			scale_num(xVel, -sign, .0000002, 0);
+			// *xVel -= sign * .005;
+			// if(sign * *xVel > 0) {
+			// 	*xVel = 0;
+			// }
+		}
+
+		
 	} else {
 		pos->y -= .5;
 	}
@@ -71,8 +84,9 @@ void draw() {
 	};
 
 	Camera cam = { { 0, 0 }, 0 };
+	int lastTimePressed[4] = {0};
 
-	int i = 0;
+	int frame = 0;
 	while(1) {
 		Pos dir = { 0, 0 };
 		getmaxyx(stdscr, cam.win_size.y, cam.win_size.x);
@@ -86,20 +100,32 @@ void draw() {
 		char c = getch();
 		switch(c) {
 			case 'd':
-				++dir.x;
+				lastTimePressed[0] = 0;
 				break;
 			case 'a':
-				--dir.x;
+				lastTimePressed[1] = 0;
 				break;
 			case 'r':
 				ch.pos.y = 10;
 				ch.pos.x = 0;
 		}
-		
-		if(i%1000==0 || true) {
+
+		for(int i = 0; i < sizeof_arr(lastTimePressed); i++) {
+			if(lastTimePressed[i] > KEY_REP_INTERVAL) continue;
+
+			int inc  = i%2==0 ? 1 : -1;
+			
+			if(i/2==0) dir.x = dir.x + inc;
+			//else dir.y = dir.y + inc;
+
+			// After the interval has passed there is no need for incrementing the variable
+			lastTimePressed[i]++;
+		}
+
+		if(frame%1000==0 || true) {
 			change_pos(&ch, &cam, level1, sizeof_arr(level1), &dir);
 		}
-		++i;
+		++frame;
 
 		refresh();
 
