@@ -29,6 +29,16 @@ void scale_num(double* num, int sign, double scale, double max) {
 	
 }
 
+void detect_collisions(Cha* cha, const int* ground, int ground_len) {
+	int flooredX = floor(cha->pos.x);
+
+	// Right bit
+	if(ground[flooredX + cha->col_size.x + 1] > cha->pos.y) {
+		cha->vel.x = 0;
+		cha->pos.x = flooredX;
+	}
+}
+
 void change_pos(Cha* cha, const Camera* cam, const int* ground, int ground_len, const Pos* dir) {
 	Posd* pos = &cha->pos;
 
@@ -40,10 +50,6 @@ void change_pos(Cha* cha, const Camera* cam, const int* ground, int ground_len, 
 			double* xVel = &cha->vel.x;
 			int sign = *xVel > 0 ? 1 : -1;
 			scale_num(xVel, -sign, .0000002, 0);
-			// *xVel -= sign * .005;
-			// if(sign * *xVel > 0) {
-			// 	*xVel = 0;
-			// }
 		}
 
 		
@@ -53,6 +59,8 @@ void change_pos(Cha* cha, const Camera* cam, const int* ground, int ground_len, 
 
 	pos->y += cha->vel.y;
 	pos->x += cha->vel.x;
+	
+	detect_collisions(cha, ground, ground_len);
 
 }
 
