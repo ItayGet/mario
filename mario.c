@@ -37,6 +37,12 @@ void detect_collisions(Cha* cha, const int* ground, int ground_len) {
 		cha->vel.x = 0;
 		cha->pos.x = flooredX;
 	}
+
+	// Left bit
+	if(ground[flooredX - 1] > cha->pos.y) {
+		cha->vel.x = 0;
+		cha->pos.x = flooredX + 1;
+	}
 }
 
 void change_pos(Cha* cha, const Camera* cam, const int* ground, int ground_len, const Pos* dir) {
@@ -87,7 +93,7 @@ void draw() {
 			{ 0, 0 }, 
 			{ 5, 5 } 
 		},
-		{ 10, 0 },
+		{ 10, 20 },
 		{ 5, 5}
 	};
 
